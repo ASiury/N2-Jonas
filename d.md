@@ -6,9 +6,9 @@
 
 # Documentação do Sistema Escolar
 
-**Bruno Rafael Paulino da Silva**
-**Iury Araújo Sabóia**
-**Rainara Coinca Cunha Fortes**
+**Bruno Rafael Paulino da Silva**--
+**Iury Araújo Sabóia**--
+**Rainara Coinca Cunha Fortes**--
 
 ## 1. Descrição Geral do Problema e da Solução
 
