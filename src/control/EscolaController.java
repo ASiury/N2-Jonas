@@ -142,12 +142,21 @@ public class EscolaController {
         return "Disciplina "+d.getNome()+" criada com sucesso!";
     }
 
-    public String cadastrarTurma(int anoEscolar, String codigo, String sala, String codigoDisciplina, char turno) {
+public String cadastrarTurma(int anoEscolar, String codigo, String sala, ArrayList<String> codigoDisciplina, char turno) {
         if (codigo == null || codigoDisciplina == null || sala == null) {
             throw new ValorIncompativelException();
         }
-        Disciplina d = disciplinaMap.get(codigoDisciplina);
-        if (d == null) throw new DisciplinaNaoCadastradaException();
+        ArrayList<Disciplina> d = new ArrayList<>();
+        boolean eNulo = true;
+        for (String s : codigoDisciplina) {
+            if (s != null) {
+                Disciplina di = disciplinaMap.get(s);
+                if (di == null) throw new DisciplinaNaoCadastradaException();
+                d.add(di);
+                eNulo = false;
+            }
+        }
+        if(eNulo) throw new DisciplinaNaoCadastradaException();
 
         if (turmaMap.containsKey(codigo)) {
             throw new JaCadastradoException("A turma de código", codigo, "a");

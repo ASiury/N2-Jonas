@@ -62,4 +62,5 @@ public class Aluno extends Pessoa {
     public String toString() {
         return this.getNome() + " - Matrícula: " + this.getMatricula();
     }
+    }
 }
