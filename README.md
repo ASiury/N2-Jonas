@@ -22,22 +22,23 @@ O sistema opera através do console (terminal) e utiliza um menu interativo num�
 
 ## Como Executar o Sistema
 
-O sistema é um projeto Java padrão sem dependências externas (como Maven ou Gradle), sendo bastante simples de executar.
+O sistema é um projeto Java padrão sem dependências externas (como Maven ou Gradle), sendo bastante simples de executar. O projeto já conta com os arquivos de configuração do IntelliJ IDEA, o que facilita muito o processo.
 
-###  Utilizando uma IDE (Recomendado)
-O projeto já conta com os arquivos de configuração do IntelliJ IDEA, o que facilita muito o processo.
+---
 
-## 📖 Como Utilizar
+## Como Utilizar
 
 Após iniciar o programa, você verá o Menu Principal. Para navegar, basta digitar o **número** correspondente à opção desejada e pressionar `Enter`.
 
+---
+
 Programa de controle escolar
 ----------------------------
-1 - Gerenciar corpo docente
-2 - Gerenciar corpo discente
-3 - Gerenciar disciplinas
-4 - Gerenciar turmas
-0 - Fechar programa
+1 - Gerenciar corpo docente`Enter`
+2 - Gerenciar corpo discente`Enter`
+3 - Gerenciar disciplinas`Enter`
+4 - Gerenciar turmas`Enter`
+0 - Fechar programa`Enter`
 
 ### 1. Gerenciar Corpo Docente (Professores)
 Ao selecionar a opção `1`, você terá acesso ao menu de professores.
