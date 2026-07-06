@@ -1,5 +1,14 @@
+# Instituto Federal do Acre
+
+# Campus de Rio Branco
+
+# Curso Tecnologico de Sistemas Para Internet
+
 # Documentação do Sistema Escolar
 
+**Bruno Rafael Paulino da Silva**
+**Iury Araújo Sabóia**
+**Rainara Coinca Cunha Fortes**
 
 ## 1. Descrição Geral do Problema e da Solução
 
