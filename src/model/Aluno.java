@@ -46,7 +46,7 @@ public class Aluno extends Pessoa {
 
     public String getRelatorio(){
         StringBuilder s = new StringBuilder();
-        s.append("Professor: ").append(this.getNome()).append("\n");
+        s.append("Aluno: ").append(this.getNome()).append("\n");
         s.append("Matricula: ").append(this.getMatricula()).append("\n");
         s.append("CPF: ").append(this.getCpf()).append("\n");
         s.append("Serie: ").append(this.getSerie()).append("\n");
