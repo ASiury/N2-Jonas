@@ -1,11 +1,10 @@
 package control.exceptions;
 
-public class TipoIncompativelException extends EscolaException {
-    public TipoIncompativelException(String s) {
-        super("O tipo do objeto é incompatível para esta operação.");
+public class TipoIncompativelException extends EscolaRuntimeException {
+    public TipoIncompativelException(String message) {
+        super(message);
     }
-
-    public TipoIncompativelException(String nome, String tipo) {
-        super(nome + " não é um " + tipo + " válido.");
+    public TipoIncompativelException(String message, Throwable cause) {
+        super(message, cause);
     }
 }

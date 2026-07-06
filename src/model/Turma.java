@@ -14,13 +14,13 @@ public class Turma {
     private ArrayList<String> salas = new ArrayList<String>();
     private ArrayList<Aluno> alunos = new ArrayList<Aluno>();
 
-    public Turma(String codigo, int anoEscolar, String sala, char turno, ArrayList<Disciplina> disciplina) {
+    public Turma(String codigo, int anoEscolar, String sala, char turno, Disciplina disciplina) {
         this.turno = turno;
         this.codigo = codigo;
         this.anoEscolar = anoEscolar;
 
         this.salas.add(sala);
-        this.disciplinas.addAll(disciplina);
+        this.disciplinas.add(disciplina);
     }
 
     public int getAnoEscolar() {

@@ -19,9 +19,38 @@ public class EscolaController {
     private Map<String, Disciplina> disciplinaMap = new HashMap<>();
     private Map<String, Turma> turmaMap = new HashMap<>();
 
+    public EscolaController() {
+        DadosPreCarregados();
+    }
+
+    private void DadosPreCarregados() {
+        try {
+            cadastrarDisciplina("Matemática", "MAT01", 60);
+            cadastrarDisciplina("Língua Portuguesa", "POR01", 60);
+            
+            cadastrarAluno("João Silva", "111.111.111-11", 6);
+            cadastrarAluno("Maria Santos", "222.222.222-22", 6);
+            
+            cadastrarProfessorEspecialista("Carlos Andrade", "333.333.333-33", "Licenciatura em Matemática", "MAT01");
+            cadastrarProfessorPolivalente("Ana Paula", "444.444.444-44", "Pedagogia");
+            
+            cadastrarTurma(6, "T01", "Sala 1", "MAT01", 'M');
+            vincularDisciplinaTurma("POR01", "T01");
+            vincularAlunoTurma("T01", "111.111.111-11");
+            vincularAlunoTurma("T01", "222.222.222-22");
+            vincularProfessorTurma("T01", "333.333.333-33");
+            
+        } catch (Exception e) {
+            System.out.println("Aviso: Falha ao carregar dados pré-cadastrados - " + e.getMessage());
+        }
+    }
+
     public void verificarSistema(String cpf){
-        if(pessoaMap.containsKey(cpf)){
-            throw new JaCadastradoException("O CPF", cpf, "o");
+        if (cpf == null) {
+            throw new InvalidInputException("O CPF não pode ser nulo");
+        }
+        if (pessoaMap.containsKey(cpf)) {
+            throw new ConflictException("O CPF", cpf, "o");
         }
     }
 
@@ -33,30 +62,30 @@ public class EscolaController {
     }
     public String removerAluno(String cpf) {
         if (cpf == null) {
-            throw new ValorIncompativelException();
+            throw new InvalidInputException("O CPF não pode ser nulo");
         }
         Pessoa pessoa = pessoaMap.get(cpf);
         if (pessoa == null) {
-            throw new PessoaNaoEncontradaException();
+            throw new NotFoundException("Pessoa não encontrada");
         }
         if (!(pessoa instanceof Aluno)) {
-            throw new TipoIncompativelException(pessoaMap.get(cpf).getNome() + "aluno");
+            throw new TipoIncompativelException(pessoaMap.get(cpf).getNome() + " não é um aluno");
         }
         pessoaMap.remove(cpf);
         return "Aluno removido com sucesso!";
     }
     public String setNotas(String cpf, String codigo, double nota) {
         if (cpf == null || codigo == null) {
-            throw new ValorIncompativelException();
+            throw new InvalidInputException("O CPF e o código não podem ser nulos");
         }
         Pessoa p = pessoaMap.get(cpf);
         if (!(p instanceof Aluno a)) {
-            throw new ErroVinculoException();
+            throw new TipoIncompativelException("Vínculo inválido");
         }
 
         boolean disciplinaEncontrada = false;
         Disciplina d = disciplinaMap.get(codigo);
-        if(d == null) throw new DisciplinaNaoCadastradaException();
+        if (d == null) throw new NotFoundException("Disciplina não encontrada");
         
         for(Turma t: turmaMap.values()){
             if(t.hasAluno(a) && t.hasDisciplina(d)){
@@ -65,14 +94,14 @@ public class EscolaController {
             }
         }
         if(!disciplinaEncontrada){
-            throw new DisciplinaIncompativelException();
+            throw new InvalidInputException("Disciplina não compatível com o aluno");
         }
 
         a.setNotas(d, nota);
         return "Você definiu a nota do aluno " + a.getNome() + " como " + nota + " na disciplina " + d.getNome() + ".";
     }
     public String setStatusMatricula(String cpf, byte num) {
-        if (!(pessoaMap.get(cpf) instanceof Aluno a)) throw new CpfInvalidoException();
+        if (!(pessoaMap.get(cpf) instanceof Aluno a)) throw new InvalidInputException("CPF inválido ou não é um aluno");
 
         String s = "";
         if (num == 1) s = "ativada";
@@ -83,14 +112,14 @@ public class EscolaController {
 
     public String removerProfessor(String cpf) {
         if (cpf == null) {
-            throw new ValorIncompativelException();
+            throw new InvalidInputException("O CPF não pode ser nulo");
         }
         Pessoa pessoa = pessoaMap.get(cpf);
         if (pessoa == null) {
             throw new PessoaNaoEncontradaException();
         }
         if (!(pessoa instanceof Professor)) {
-            throw new TipoIncompativelException(pessoaMap.get(cpf).getNome() + "aluno");
+            throw new TipoIncompativelException(pessoaMap.get(cpf).getNome() + " não é um professor");
         }
         pessoaMap.remove(cpf);
         return "Professor removido com sucesso!";
@@ -98,68 +127,62 @@ public class EscolaController {
     public String cadastrarProfessorPolivalente(String nome, String cpf, String formacao){
         verificarSistema(cpf);
         Professor p = new ProfessorPolivalente(nome, cpf, formacao);
-        if(!formacao.equals("Pedagogia")){
-            throw new TipoIncompativelException(pessoaMap.get(cpf).getNome() + "professor");
+        if (!Objects.equals(formacao, "Pedagogia")) {
+            throw new TipoIncompativelException("Professor tem formação incompatível");
         }
         pessoaMap.put(cpf, p);
         return "Professor cadastrado com sucesso!";
     }
     public String cadastrarProfessorEspecialista(String nome, String cpf, String formacao, String codigoDisciplina){
         Disciplina d = disciplinaMap.get(codigoDisciplina);
-        if(d == null) throw new DisciplinaNaoCadastradaException();
+        if(d == null) throw new NotFoundException("Disciplina não cadastrada");
         verificarSistema(cpf);
         Professor p = new ProfessorEspecialista(nome, cpf, formacao, d);
-        if(formacao.equals("Pedagogia")){
-           throw new TipoIncompativelException(pessoaMap.get(cpf).getNome() + "professor");
+        if (Objects.equals(formacao, "Pedagogia")) {
+           throw new TipoIncompativelException("Professor tem formação incompatível");
         }
         pessoaMap.put(cpf, p);
         return "Professor cadastrado com sucesso!";
     }
     public String setarDisciplinaProfessor(String cpf, String code){
         if(code == null || cpf == null) {
-            throw new ValorIncompativelException();
+            throw new InvalidInputException("O código ou CPF não podem ser nulos");
         }
-        ProfessorEspecialista p = (ProfessorEspecialista) pessoaMap.get(cpf);
+        Professor p = (Professor) pessoaMap.get(cpf);
         Disciplina d = disciplinaMap.get(code);
-        p.setarDisciplinas(d);
+        if(p == null) throw new PessoaNaoEncontradaException();
+        if(d == null) throw new NotFoundException("Disciplina não encontrada");
+        if(!(p instanceof ProfessorEspecialista)) throw new TipoIncompativelException("Professor não é especialista");
+        ((ProfessorEspecialista) p).setarDisciplinas(d);
         return "Disciplina "+d.getNome()+" foi atribuída para "+p.getNome()+" com sucesso!";
     }
 
     public String removerDisciplina(String codigo){
-        if(codigo == null) throw new ValorIncompativelException();
+        if (codigo == null) throw new InvalidInputException("O código não pode ser nulo");
         Disciplina d = disciplinaMap.get(codigo);
-        if(d == null) throw new ValorIncompativelException();
+        if (d == null) throw new NotFoundException("Disciplina não encontrada");
         String nome =  d.getNome();
         disciplinaMap.remove(codigo);
 
         return "Disciplina "+nome+" removida do sistema.";
     }
     public String cadastrarDisciplina(String nome, String codigo, int cargaHoraria){
-        if(codigo == null) throw new ValorIncompativelException();
-        if(disciplinaMap.get(codigo) != null) throw new DisciplinaJaCadastradaException( codigo +" já foi cadastrado no sistema.");
+        if (codigo == null) throw new InvalidInputException("O código não pode ser nulo");
+        if (disciplinaMap.get(codigo) != null) throw new ConflictException("Disciplina " + codigo + " já foi cadastrado no sistema.");
         Disciplina d = new Disciplina(nome, codigo, cargaHoraria);
         disciplinaMap.put(codigo, d);
         return "Disciplina "+d.getNome()+" criada com sucesso!";
     }
 
-public String cadastrarTurma(int anoEscolar, String codigo, String sala, ArrayList<String> codigoDisciplina, char turno) {
+    public String cadastrarTurma(int anoEscolar, String codigo, String sala, String codigoDisciplina, char turno) {
         if (codigo == null || codigoDisciplina == null || sala == null) {
-            throw new ValorIncompativelException();
+            throw new InvalidInputException("O código, código da disciplina ou sala não podem ser nulos");
         }
-        ArrayList<Disciplina> d = new ArrayList<>();
-        boolean eNulo = true;
-        for (String s : codigoDisciplina) {
-            if (s != null) {
-                Disciplina di = disciplinaMap.get(s);
-                if (di == null) throw new DisciplinaNaoCadastradaException();
-                d.add(di);
-                eNulo = false;
-            }
-        }
-        if(eNulo) throw new DisciplinaNaoCadastradaException();
+        Disciplina d = disciplinaMap.get(codigoDisciplina);
+        if (d == null) throw new NotFoundException("Disciplina não encontrada");
 
         if (turmaMap.containsKey(codigo)) {
-            throw new JaCadastradoException("A turma de código", codigo, "a");
+            throw new ConflictException("A turma de código", codigo, "a");
         }
         for(Turma t: turmaMap.values()){
             for(int i = 0; i < t.getSalas().size(); i++){
@@ -174,7 +197,7 @@ public String cadastrarTurma(int anoEscolar, String codigo, String sala, ArrayLi
     }
     public String removerTurma(String codigo) {
         if (codigo == null) {
-            throw new ValorIncompativelException();
+            throw new InvalidInputException("codigo cannot be null");
         }
         Turma t = turmaMap.remove(codigo);
         if (t != null) {
@@ -184,40 +207,40 @@ public String cadastrarTurma(int anoEscolar, String codigo, String sala, ArrayLi
         }
     }
     public String vincularAlunoTurma(String codigo, String cpf){
-        if(!pessoaMap.containsKey(cpf)) throw new ErroVinculoException("Aluno não matriculado.");
-        if(!(pessoaMap.get(cpf) instanceof Aluno)) throw new TipoIncompativelException(pessoaMap.get(cpf).getNome() + " não é aluno");
+        if(!pessoaMap.containsKey(cpf)) throw new NotFoundException("Aluno não matriculado.");
+        if(!(pessoaMap.get(cpf) instanceof Aluno a)) throw new TipoIncompativelException(pessoaMap.get(cpf).getNome() + " não é aluno");
         Turma t = turmaMap.get(codigo);
-        if(t == null) throw new ValorIncompativelException("Turma não encontrada.");
-        Aluno a = (Aluno)pessoaMap.get(cpf);
+        if(t == null) throw new NotFoundException("Turma não encontrada.");
 
-        if(a.getSerie() != t.getAnoEscolar()) throw new ErroVinculoException("Ano de estudo incompatível.");
+        if(a.getSerie() != t.getAnoEscolar()) throw new TipoIncompativelException("Ano de estudo incompatível.");
 
         t.addAluno(a);
         return "Aluno inserido na turma "+t.getCodigo()+".";
     }
     public String desvincularAlunoTurma(String codigo, String cpf){
-        if(!pessoaMap.containsKey(cpf)) throw new PessoaNaoEncontradaException();
-        if(!(pessoaMap.get(cpf) instanceof Aluno a)) throw new TipoIncompativelException(pessoaMap.get(cpf).getNome()+ "aluno");
+        if(!pessoaMap.containsKey(cpf)) throw new NotFoundException("Pessoa não encontrada");
+        if(!(pessoaMap.get(cpf) instanceof Aluno a)) throw new TipoIncompativelException(pessoaMap.get(cpf).getNome()+ " não é um aluno");
 
         Turma t = turmaMap.get(codigo);
-
+        if(t == null) throw new NotFoundException("Turma não encontrada.");
+       
         t.removeAluno(a);
         return "Aluno removido na turma "+t.getCodigo()+".";
     }
     public String vincularProfessorTurma(String codigo, String cpf){
         Turma t = turmaMap.get(codigo);
         if(t == null) throw new ValorIncompativelException("Turma não encontrada.");
-        Professor p = (Professor)pessoaMap.get(cpf);
-
+        Pessoa pessoa = pessoaMap.get(cpf);
+        if (pessoa == null) throw new NotFoundException("Professor não encontrado");
+        if (!(pessoa instanceof Professor p)) throw new TipoIncompativelException("O CPF informado não pertence a um professor.");
         if(t.getAnoEscolar() >= 1 && t.getAnoEscolar() <= 5 ){
-            if(!(p instanceof ProfessorPolivalente)) throw new ErroVinculoException();
+            if(!(p instanceof ProfessorPolivalente)) throw new TipoIncompativelException("Polivalente não pode ser vinculado");
             if(t.getProfessores().size() == 1) throw new LimiteProfessorAtingidoException();
             t.addProfessor(p);
             p.setQtdTurmas(p.getQtdTurmas()+1);
-            System.out.println("Professor "+p.getNome()+" inserido na turma "+t.getCodigo()+".");
         }
         else if(t.getAnoEscolar() >= 6 && t.getAnoEscolar() <= 9 ){
-            if(!(p instanceof ProfessorEspecialista)) throw new ErroVinculoException();
+            if(!(p instanceof ProfessorEspecialista)) throw new TipoIncompativelException("Especialista não pode ser vinculado");
             if(t.getProfessores().size() == t.getDisciplinas().size()) throw new LimiteProfessorAtingidoException();
             for(Professor p1:t.getProfessores()){
                 if(p1.getCpf().equals(cpf)){
@@ -234,19 +257,19 @@ public String cadastrarTurma(int anoEscolar, String codigo, String sala, ArrayLi
             if(temDisciplina) {
                 t.addProfessor(p);
                 p.setQtdTurmas(p.getQtdTurmas()+1);
-                System.out.println("Professor "+p.getNome()+" inserido na turma "+t.getCodigo()+".");
-            } else throw new ErroVinculoException("O professor não ministra nenhuma disciplina da turma.");
+            } else throw new TipoIncompativelException("O professor não ministra nenhuma disciplina da turma.");
         }
         else{
-            throw new ProfessorIncompativelException();
+            throw new TipoIncompativelException("Professor incompatível com a turma");
         }
         return "Professor "+p.getNome()+" inserido na turma "+t.getCodigo()+" com sucesso.";
     }
     public String desvincularProfessorTurma(String codigo, String cpf){
-        if(!pessoaMap.containsKey(cpf)) throw new PessoaNaoEncontradaException();
-        if(!(pessoaMap.get(cpf) instanceof Professor p)) throw new TipoIncompativelException(pessoaMap.get(cpf).getNome(), "professor");
+        if(!pessoaMap.containsKey(cpf)) throw new NotFoundException("Pessoa não encontrada");
+        if(!(pessoaMap.get(cpf) instanceof Professor p)) throw new TipoIncompativelException(pessoaMap.get(cpf).getNome() + " não é professor");
 
         Turma t = turmaMap.get(codigo);
+        if(t == null) throw new ValorIncompativelException("Turma não encontrada.");
         if(t.getProfessores().size() < 2) throw new ProfessoresInsuficientesException();
 
         t.removeProfessor(p);
@@ -263,8 +286,8 @@ public String cadastrarTurma(int anoEscolar, String codigo, String sala, ArrayLi
     public String desvincularDisciplinaTurma(String codigoDisciplina, String codigoTurma){
         Disciplina d = disciplinaMap.get(codigoDisciplina);
         Turma t = turmaMap.get(codigoTurma);
-        if(d == null) throw new DisciplinaNaoCadastradaException();
-        if(t == null) throw new ValorIncompativelException("Turma não encontrada.");
+        if(d == null) throw new NotFoundException("Disciplina não encontrada");
+        if(t == null) throw new NotFoundException("Turma não encontrada.");
         t.removeDisciplina(d);
         return "Disciplina desvinculada da turma com sucesso!";
     }
