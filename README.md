@@ -28,7 +28,7 @@ O sistema é um projeto Java padrão sem dependências externas (como Maven ou G
 
 ## Como Utilizar
 
-Após iniciar o programa, você verá o Menu Principal. Para navegar, basta digitar o **número** correspondente à opção desejada e pressionar `Enter`.
+Após iniciar o programa, você verá o Menu Principal. Para navegar, basta digitar o **número** correspondente à opção desejada e pressionar.
 
 ---
 
