@@ -53,7 +53,7 @@ public class Aluno extends Pessoa {
         s.append("Status da matrícula: ").append(this.getStatus()).append("\n");
         for(Disciplina d: this.getNotas().keySet()){
             s.append("--------------------------------\n");
-            s.append("Disciplina: ").append(d.getNome()).append("\n nota: ").append(this.getNotas().get(d)).append("\n");
+            s.append("Disciplina: ").append(d.getNome()).append("| nota: ").append(this.getNotas().get(d)).append("\n");
         }
         return s.toString();
     }

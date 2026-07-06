@@ -36,6 +36,7 @@ public class EscolaController {
             
             cadastrarTurma(6, "T01", "Sala 1", "MAT01", 'M');
             vincularDisciplinaTurma("POR01", "T01");
+            vincularDisciplinaTurma("MAT01", "T01");
             vincularAlunoTurma("T01", "111.111.111-11");
             vincularAlunoTurma("T01", "222.222.222-22");
             vincularProfessorTurma("T01", "333.333.333-33");
