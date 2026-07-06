@@ -27,7 +27,6 @@ public class EscolaView {
             }
             processarOpcao(opcao);
         }
-        ler.close();
     }
 
     public void menuInicial() {
@@ -128,7 +127,7 @@ public class EscolaView {
                         System.out.println("Erro inesperado ou entrada inválida. Tente novamente.");
                         ler.nextLine();
                     }
-                } while (o != 0);
+                    } while (o != 0);
                 break;
             case 2:
                 do {
@@ -291,6 +290,5 @@ public class EscolaView {
             default:
                 System.out.println("Opcao invalida");
         }
-        ler.close();
     }
 }
