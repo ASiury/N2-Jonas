@@ -32,7 +32,7 @@ public class EscolaView {
     public void menuInicial() {
         System.out.println("Programa de controle escolar");
         System.out.println("----------------------------");
-        System.out.println("1 - Gerenciar corpo doscente");
+        System.out.println("1 - Gerenciar corpo docente");
         System.out.println("2 - Gerenciar corpo discente");
         System.out.println("3 - Gerenciar disciplinas");
         System.out.println("4 - Gerenciar turmas");
